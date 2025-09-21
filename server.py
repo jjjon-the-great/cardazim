@@ -2,6 +2,16 @@ import argparse
 import sys
 import socket
 import struct
+import threading
+
+def get_message_from_socket(connected_socket : socket.socket):
+    '''
+    takes in socket object, gets it's message and processes it.
+    '''
+    (length, ) = struct.unpack("<I", connected_socket.recv(4))
+    (text, ) = struct.unpack(f"<{length}s", connected_socket.recv(length))
+    print(text.decode('utf-8'))
+    connected_socket.close()
 
 def run_server(server_ip, server_port):
     '''
@@ -13,11 +23,8 @@ def run_server(server_ip, server_port):
     while True:
         s.listen()
         (conn, addr) = s.accept()
-        (length,) = struct.unpack("<I",conn.recv(4))
-        (text,) = struct.unpack(f"<{length}s",conn.recv(length))
-        print(text.decode('utf-8'))
-        conn.close()
-    
+        t = threading.Thread(target = get_message_from_socket, args=(conn, ))
+        t.start()
 
 def get_args():
     parser = argparse.ArgumentParser(description='initialize server.')
