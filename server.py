@@ -3,35 +3,28 @@ import sys
 import socket
 import struct
 
-###########################################################
-####################### YOUR CODE #########################
-###########################################################
-
-
-def send_data(server_ip, server_port, data):
+def run_server(server_ip, server_port):
     '''
-    Send data to server in address (server_ip, server_port).
+    starts listening on ip, port
     '''
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((server_ip,server_port))
-    message = struct.pack(f'<I{len(data.encode('utf-8'))}s',len(data.encode('utf-8')),data.encode('utf-8'))
-    s.send(message)
-    s.close()
-
-
-###########################################################
-##################### END OF YOUR CODE ####################
-###########################################################
-
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((server_ip,server_port))
+    while True:
+        s.listen()
+        (conn, addr) = s.accept()
+        (length,) = struct.unpack("<I",conn.recv(4))
+        (text,) = struct.unpack(f"<{length}s",conn.recv(length))
+        print(text.decode('utf-8'))
+        conn.close()
+    
 
 def get_args():
-    parser = argparse.ArgumentParser(description='Send data to server.')
+    parser = argparse.ArgumentParser(description='initialize server.')
     parser.add_argument('server_ip', type=str,
                         help='the server\'s ip')
     parser.add_argument('server_port', type=int,
                         help='the server\'s port')
-    parser.add_argument('data', type=str,
-                        help='the data')
     return parser.parse_args()
 
 
@@ -41,7 +34,7 @@ def main():
     '''
     args = get_args()
     try:
-        send_data(args.server_ip, args.server_port, args.data)
+        run_server(args.server_ip, args.server_port)
         print('Done.')
     except Exception as error:
         print(f'ERROR: {error}')
