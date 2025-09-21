@@ -13,8 +13,10 @@ def send_data(server_ip, server_port, data):
     Send data to server in address (server_ip, server_port).
     '''
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((server_ip,server_port))
-    message = struct.pack(f'<I{len(data.encode('utf-8'))}s',len(data.encode('utf-8')),data.encode('utf-8'))
+    s.connect((server_ip, server_port))
+    message_length = len(data.encode('utf-8'))
+    #sedning struct containing message length and the message itself
+    message = struct.pack(f'<I{message_length}s', message_length, data.encode('utf-8'))
     s.send(message)
     s.close()
 
