@@ -10,7 +10,7 @@ def get_message_from_socket(connected_socket: socket.socket):
     '''
     (length, ) = struct.unpack("<I", connected_socket.recv(4))
     (text, ) = struct.unpack(f"<{length}s", connected_socket.recv(length))
-    print(text.decode('utf-8'))
+    print(f"Received data: {text.decode('utf-8')}")
     connected_socket.close()
 
 def run_server(server_ip, server_port):
