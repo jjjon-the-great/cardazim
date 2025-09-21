@@ -14,10 +14,8 @@ def send_data(server_ip, server_port, data):
     '''
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((server_ip,server_port))
-    message = struct.pack('<Is',len(data),data)
+    message = struct.pack(f'<I{len(data.encode('utf-8'))}s',len(data.encode('utf-8')),data.encode('utf-8'))
     s.send(message)
-    #DEBUG:
-    print(message)
     s.close()
 
 
